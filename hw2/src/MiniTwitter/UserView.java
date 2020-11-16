@@ -23,7 +23,7 @@ public class UserView extends JFrame implements Entry, Observer {
     String id;
     Group group = new Group("root") {
         @Override
-        public void update(Observable o, Object arg) {
+        public void update(Observable user, Object text) {
         }
     };
 
@@ -34,7 +34,7 @@ public class UserView extends JFrame implements Entry, Observer {
         this.setTitle("User: " + id);
         this.setContentPane(UserPanel);
         this.pack();
-        updateNewsFeed();
+        updateTweets();
 
         postTweetButton.addActionListener(new ActionListener() {
             @Override
@@ -44,7 +44,7 @@ public class UserView extends JFrame implements Entry, Observer {
                 Counter tweetTotal = new Counter();
                 tweetTotal.accept_messageCount();
                 for (UserView userId : followingNameList) {
-                    userId.updateNewsFeed();
+                    userId.updateTweets();
                 }
                 tweetMessageTextArea.setText("");
             }
@@ -56,15 +56,15 @@ public class UserView extends JFrame implements Entry, Observer {
                 followingNameList.add(follower);
                 follower.followerNameList.add(UserView.this);
                 userIdsList.removeItem(follower);
-                updateFollowingUserList();
+                updateFollowingList();
             }
         });
     }
-    public void updateNewsFeed() {
+    public void updateTweets() {
         DefaultListModel newsFeedModel = new DefaultListModel();
         for (UserView userId : followingNameList) {
-            for (String msg : userId.TweetList) {
-                newsFeedModel.addElement(userId + ": " + msg);
+            for (String message : userId.TweetList) {
+                newsFeedModel.addElement(userId + ": " + message);
             }
         }
         for (String tweet : TweetList) {
@@ -72,14 +72,14 @@ public class UserView extends JFrame implements Entry, Observer {
         }
         newsList.setModel(newsFeedModel);
     }
-    public void updateFollowingUserList() {
+    public void updateFollowingList() {
         DefaultListModel defaultListModel = new DefaultListModel();
         for (UserView userId : followingNameList) {
             defaultListModel.addElement(userId);
         }
         currentFollowingList.setModel(defaultListModel);
     }
-    public void updateUserList() {
+    public void updateUserIdList() {
         userIdsList.removeAllItems();
         HashMap<String, UserView> s = new HashMap<String, UserView>();
         s.putAll((AdminControlPanel.users));
@@ -96,7 +96,7 @@ public class UserView extends JFrame implements Entry, Observer {
     }
     public void tweet(String tweet) {
         TweetList.add(tweet);
-        updateNewsFeed();
+        updateTweets();
     }
     public JComboBox getAllUserList() {
         return userIdsList;
@@ -122,17 +122,16 @@ public class UserView extends JFrame implements Entry, Observer {
     public void setNewsList(JList newsList) {
         this.newsList = newsList;
     }
-    //_________________Observer_____________________
     @Override
     public void update (Observable follower, Object message) {
-        updateUserList();
-        updateNewsFeed();
-        updateFollowingUserList();
+        updateUserIdList();
+        updateTweets();
+        updateFollowingList();
     }
     public void updateUser (UserView follower, String message) {
-        updateUserList();
-        updateNewsFeed();
-        updateFollowingUserList();
+        updateUserIdList();
+        updateTweets();
+        updateFollowingList();
         setVisible(this.isShowing());
     }
      private void initialComponents() {
