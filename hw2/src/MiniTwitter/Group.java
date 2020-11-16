@@ -11,12 +11,6 @@ public abstract class Group extends JFrame implements Entry {
         this.userList = new ArrayList();
         this.groupList = new ArrayList();
     }
-
-    /*@Override
-    public void accept(Visitor visitor) {
-        visitor.visit_groupCount(this);
-    }*/
-
     public void newUser(UserView user) {
         this.userList.add(user);
     }
