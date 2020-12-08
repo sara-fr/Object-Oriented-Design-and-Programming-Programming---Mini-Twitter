@@ -1,8 +1,8 @@
 package MiniTwitter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import javax.swing.*;
@@ -17,24 +17,35 @@ public class UserView extends JFrame implements Entry, Observer {
     private JList newsList;
     private JLabel currentFollowingLabel;
     private JLabel newsFeedLabel;
+    private JLabel creationTimeLabel;
+    private JLabel timeLabel;
+    private JLabel lastUpdateTimeLabel;
+    private JLabel updateTimeLabel;
     private ArrayList<UserView> followingNameList = new ArrayList<>();
     private ArrayList<UserView> followerNameList = new ArrayList<>();
     protected ArrayList<String> TweetList = new ArrayList<>();
     String id;
-    Group group = new Group("root") {
+    public static HashMap<String, Long> updatedUser = new HashMap();
+    private long time;
+    private long lastUpdateTime;
+    Group group = new Group("root", System.currentTimeMillis()) {
         @Override
         public void update(Observable user, Object text) {
         }
     };
 
-    public UserView(String id) {
+    public UserView(String id, long creationTime) {
         //initialComponents();
         setBounds(100, 100, 700, 500);
         this.id = id;
+        this.time = creationTime;
         this.setTitle("User: " + id);
         this.setContentPane(UserPanel);
         this.pack();
         updateTweets();
+        SimpleDateFormat timeFormatting = new SimpleDateFormat("MMM dd,yyyy HH:mm");
+        Date userCreationTime = new Date(time);
+        timeLabel.setText(timeFormatting.format(userCreationTime));
 
         postTweetButton.addActionListener(new ActionListener() {
             @Override
@@ -65,12 +76,18 @@ public class UserView extends JFrame implements Entry, Observer {
         for (UserView userId : followingNameList) {
             for (String message : userId.TweetList) {
                 newsFeedModel.addElement(userId + ": " + message);
+                lastUpdateTime = System.currentTimeMillis();
+                updatedUser.put(String.valueOf(userId), lastUpdateTime);
             }
         }
         for (String tweet : TweetList) {
             newsFeedModel.addElement(tweet);
+            lastUpdateTime = System.currentTimeMillis();
         }
         newsList.setModel(newsFeedModel);
+        SimpleDateFormat timeFormatting = new SimpleDateFormat("MMM dd,yyyy HH:mm");
+        Date lastUpdate = new Date(lastUpdateTime);
+        updateTimeLabel.setText(timeFormatting.format(lastUpdate));
     }
     public void updateFollowingList() {
         DefaultListModel defaultListModel = new DefaultListModel();
@@ -96,6 +113,8 @@ public class UserView extends JFrame implements Entry, Observer {
     }
     public void tweet(String tweet) {
         TweetList.add(tweet);
+        lastUpdateTime = System.currentTimeMillis();
+        updatedUser.put(this.id, lastUpdateTime);
         updateTweets();
     }
     public JComboBox getAllUserList() {
@@ -163,5 +182,17 @@ public class UserView extends JFrame implements Entry, Observer {
          newsList = new JList();
          newsList.setBounds(10,300,400,120);
          UserPanel.add(newsList);
+         creationTimeLabel = new JLabel("Creation Time: ");
+         creationTimeLabel.setBounds(10,50,400,120);
+         UserPanel.add(creationTimeLabel);
+         timeLabel = new JLabel("Time");
+         timeLabel.setBounds(300,50,400,120);
+         UserPanel.add(timeLabel);
+         lastUpdateTimeLabel = new JLabel("Last Update Time: ");
+         lastUpdateTimeLabel.setBounds(10,100,400,120);
+         UserPanel.add(lastUpdateTimeLabel);
+         updateTimeLabel = new JLabel("updateTime");
+         updateTimeLabel.setBounds(300,100,400,120);
+         UserPanel.add(updateTimeLabel);
      }
 }

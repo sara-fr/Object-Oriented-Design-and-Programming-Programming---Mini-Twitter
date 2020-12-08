@@ -6,8 +6,10 @@ public abstract class Group extends JFrame implements Entry {
     private String groupName;
     private ArrayList<Entry> userList;
     private ArrayList<Entry> groupList;
-    public Group(String name) {
+    long time;
+    public Group(String name, long creationTime) {
         this.groupName = name;
+        this.time = creationTime;
         this.userList = new ArrayList();
         this.groupList = new ArrayList();
     }
